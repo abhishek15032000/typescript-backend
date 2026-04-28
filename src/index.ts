@@ -1,17 +1,25 @@
+import 'dotenv/config'
+import express from "express";
+import { connectDB, disconnectDB } from './config/database';
+const app = express();
 
-import { createServer, IncomingMessage, ServerResponse } from 'http';
-
-const server = createServer((req: IncomingMessage, res: ServerResponse) => {
-   res.setHeader("Content-type","application/json");
-   if(req.url == "/"){
-    res.writeHead(200);
-    res.end(JSON.stringify({message:"Hello World"}));
-   }else{
-    res.writeHead(404);
-    res.end(JSON.stringify({message:"Not Found"}));
-   }
+// this would be like a defer in golang
+// setImmadiate is better way to do this 
+// because it will not block the event loop
+setImmediate(async() : Promise<void> =>{
+  await disconnectDB();
 })
 
-server.listen(3000, ()=>{
-    console.log("server is running on port 3000");
+const DB_URL : undefined | null | string = process.env["DATABASE_URI"];
+if (!DB_URL) {
+   throw new Error("cant start because env not loaded");
+}
+connectDB(DB_URL);
+
+app.get("/", (req, res) => {
+    res.status(200).json({message:"Hello World!"});
 })
+
+app.listen(3000, () => {
+    console.log("Server is running on port 3000");
+});
