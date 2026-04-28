@@ -3,8 +3,14 @@ import express from "express";
 import { connectDB } from './config/database.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger.js';
-import authRoutes from './routes/auth.js';
+import authRoutes from './routes/authRoutes.js';
+import blogRoutes from "./routes/blogRoutes.js";
+import morgan from "morgan";
+import cors from "cors";
 const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(morgan("dev"));
 
 // this would be like a defer in golang
 // setImmadiate is better way to do this 
@@ -18,11 +24,12 @@ if (!DB_URL) {
 app.get("/", (req, res) => {
     res.status(200).json({message:"Hello World!"});
 })
+// process any time of incoming request of type json.
 
-app.use(express.json());
 
 // api routes
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/blogs", blogRoutes)
 
 //swagger docs
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
