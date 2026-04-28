@@ -5,7 +5,7 @@ import mongoose from 'mongoose'
 const MAX_RETRIES = 5;
 const RETRY_DELAY = 5000; // 5 sec
 
-export const connectDB = async (uri:string) => {
+export const connectDB = async (uri:string) : Promise<void> => {
   let retries = 0;
 
   while (retries < MAX_RETRIES) {
@@ -31,7 +31,7 @@ export const connectDB = async (uri:string) => {
       return;
     } catch (err) {
       retries++;
-      console.error(`❌ Attempt ${retries} failed`);
+      console.error(`❌ Attempt ${retries} failed:`, err);
 
       if (retries >= MAX_RETRIES) {
         console.error("🚨 Max retries reached. Exiting...");
@@ -43,12 +43,3 @@ export const connectDB = async (uri:string) => {
     }
   }
 };
-
-export const disconnectDB = async () : Promise<void> => {
-    try{
-        await mongoose.connection.close();
-        console.log("closed db connection gracefully");
-    } catch (error) {
-        console.log("problem happened in deisconnection db");
-    }
-}
